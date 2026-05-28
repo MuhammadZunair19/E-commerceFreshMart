@@ -1,0 +1,9 @@
+{
+  "name": "FreshMart",
+  "short_name": "FreshMart",
+  "description": "Fresh grocery delivery storefront",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FFF8",
+  "theme_color": "#1B4332"
+}
