@@ -1,12 +1,17 @@
 import { Bell, Heart, MapPin, PackageCheck, Settings, UserRound } from "lucide-react";
 import { recentOrders } from "@/lib/data";
 import { formatPkr } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function AccountPage() {
   return (
     <div className="container-x py-8 lg:py-12">
       <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
-        <aside className="h-fit rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
+        <Card className="h-fit">
+          <CardContent className="p-5">
           <div className="flex items-center gap-3">
             <div className="grid h-14 w-14 place-items-center rounded-lg bg-forest text-white">
               <UserRound className="h-7 w-7" />
@@ -26,45 +31,58 @@ export default function AccountPage() {
             ].map((item, index) => {
               const Icon = item.icon;
               return (
-                <button key={item.label} className={`flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-bold ${index === 0 ? "bg-cream text-forest" : "text-muted hover:bg-cream"}`}>
+                <Button key={item.label} variant={index === 0 ? "secondary" : "ghost"} className="w-full justify-start">
                   <Icon className="h-5 w-5" />
                   {item.label}
-                </button>
+                </Button>
               );
             })}
           </nav>
-        </aside>
+          </CardContent>
+        </Card>
 
         <section className="space-y-6">
-          <div className="rounded-lg border border-forest/10 bg-white p-6 shadow-sm">
+          <Card>
+            <CardHeader>
             <p className="text-sm font-black uppercase tracking-[0.18em] text-fresh">Profile</p>
-            <h2 className="mt-2 text-3xl font-black text-forest">Account overview</h2>
+            <CardTitle className="text-3xl">Account overview</CardTitle>
+            </CardHeader>
+            <CardContent>
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               {[
                 ["Lifetime spend", formatPkr(42860)],
                 ["Saved addresses", "3"],
                 ["Wishlist items", "12"]
               ].map(([label, value]) => (
-                <div key={label} className="rounded-lg bg-cream p-5">
+                <Card key={label} className="bg-cream p-5 shadow-none">
                   <p className="text-sm font-bold text-muted">{label}</p>
                   <p className="mt-1 text-2xl font-black text-forest">{value}</p>
-                </div>
+                </Card>
               ))}
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-lg border border-forest/10 bg-white p-6 shadow-sm">
+          <Card>
+            <CardHeader className="flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
               <div>
-                <h2 className="text-2xl font-black text-forest">Order history</h2>
-                <p className="mt-1 text-muted">Filterable status timeline placeholder for Supabase orders.</p>
+                <CardTitle className="text-2xl">Order history</CardTitle>
+                <CardDescription className="mt-1">Filterable status timeline placeholder for Supabase orders.</CardDescription>
               </div>
-              <select className="h-11 rounded-lg border border-forest/10 px-3 text-sm font-bold">
-                <option>All statuses</option>
-                <option>Pending</option>
-                <option>Delivered</option>
-              </select>
+              <Select defaultValue="all">
+                <SelectTrigger className="h-11 w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            </CardHeader>
+            <CardContent>
             <div className="mt-5 overflow-hidden rounded-lg border border-forest/10">
               {recentOrders.map((order) => (
                 <div key={order.id} className="grid gap-3 border-b border-forest/10 p-4 last:border-b-0 md:grid-cols-[1fr_160px_120px] md:items-center">
@@ -73,23 +91,28 @@ export default function AccountPage() {
                     <p className="text-sm text-muted">Placed {order.time}</p>
                   </div>
                   <p className="font-black">{formatPkr(order.total)}</p>
-                  <span className="rounded-full bg-cream px-3 py-1 text-center text-xs font-black text-forest">{order.status}</span>
+                  <Badge variant="secondary" className="justify-center">{order.status}</Badge>
                 </div>
               ))}
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-lg border border-forest/10 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl font-black text-forest">Delivery addresses</h2>
+          <Card>
+            <CardHeader>
+            <CardTitle className="text-2xl">Delivery addresses</CardTitle>
+            </CardHeader>
+            <CardContent>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               {["Home - Gulberg III, Lahore", "Work - Blue Area, Islamabad"].map((address) => (
-                <div key={address} className="rounded-lg border border-forest/10 p-4">
+                <Card key={address} className="p-4 shadow-none">
                   <p className="font-black">{address}</p>
                   <p className="mt-2 text-sm text-muted">Ayesha Khan · +92 300 0000000</p>
-                </div>
+                </Card>
               ))}
             </div>
-          </div>
+            </CardContent>
+          </Card>
         </section>
       </div>
     </div>

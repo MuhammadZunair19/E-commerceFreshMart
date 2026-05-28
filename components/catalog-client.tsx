@@ -5,6 +5,13 @@ import { Grid2X2, List, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { categories, products } from "@/lib/data";
 import { cn, formatPkr } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 
 export function CatalogClient({
   initialSearch,
@@ -47,78 +54,92 @@ export function CatalogClient({
           <p className="mt-3 max-w-2xl text-muted">Browse categories, filter essentials, compare prices, and build a cart with live totals.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setView("grid")} className={cn("grid h-11 w-11 place-items-center rounded-lg border border-forest/10", view === "grid" && "bg-forest text-white")} aria-label="Grid view">
+          <Button onClick={() => setView("grid")} variant={view === "grid" ? "default" : "outline"} size="icon" className="h-11 w-11" aria-label="Grid view">
             <Grid2X2 className="h-5 w-5" />
-          </button>
-          <button onClick={() => setView("list")} className={cn("grid h-11 w-11 place-items-center rounded-lg border border-forest/10", view === "list" && "bg-forest text-white")} aria-label="List view">
+          </Button>
+          <Button onClick={() => setView("list")} variant={view === "list" ? "default" : "outline"} size="icon" className="h-11 w-11" aria-label="List view">
             <List className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside className="h-fit rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-forest">
-            <SlidersHorizontal className="h-5 w-5" />
-            <h2 className="font-black">Filters</h2>
-          </div>
-          <label className="mt-5 block text-sm font-bold text-ink">
+        <Card className="h-fit">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <SlidersHorizontal className="h-5 w-5" />
+              Filters
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+          <label className="block text-sm font-bold text-ink">
             Search
-            <input
+            <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="mt-2 h-11 w-full rounded-lg border border-forest/10 px-3 outline-none focus:border-fresh focus:ring-4 focus:ring-fresh/15"
+              className="mt-2 h-11"
               placeholder="Product or brand"
             />
           </label>
           <label className="mt-4 block text-sm font-bold text-ink">
             Category
-            <select value={category} onChange={(event) => setCategory(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-forest/10 px-3 outline-none">
-              <option value="all">All categories</option>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="mt-2 h-11">
+                <SelectValue placeholder="All categories" />
+              </SelectTrigger>
+              <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
               {categories.map((item) => (
-                <option key={item.slug} value={item.slug}>{item.name}</option>
+                <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>
               ))}
-            </select>
+              </SelectContent>
+            </Select>
           </label>
           <label className="mt-4 block text-sm font-bold text-ink">
             Sort
-            <select value={sort} onChange={(event) => setSort(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-forest/10 px-3 outline-none">
-              <option value="popular">Most popular</option>
-              <option value="price-low">Price: low to high</option>
-              <option value="price-high">Price: high to low</option>
-              <option value="rated">Best rated</option>
-              <option value="newest">Newest</option>
-            </select>
+            <Select value={sort} onValueChange={setSort}>
+              <SelectTrigger className="mt-2 h-11">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="popular">Most popular</SelectItem>
+                <SelectItem value="price-low">Price: low to high</SelectItem>
+                <SelectItem value="price-high">Price: high to low</SelectItem>
+                <SelectItem value="rated">Best rated</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+              </SelectContent>
+            </Select>
           </label>
           <div className="mt-5">
             <div className="flex justify-between text-sm font-bold">
               <span>Max price</span>
               <span>{formatPkr(maxPrice)}</span>
             </div>
-            <input type="range" min="200" max="1200" step="50" value={maxPrice} onChange={(event) => setMaxPrice(Number(event.target.value))} className="mt-3 w-full accent-forest" />
+            <Slider className="mt-4" min={200} max={1200} step={50} value={[maxPrice]} onValueChange={(value) => setMaxPrice(value[0] ?? 1200)} />
           </div>
           <label className="mt-5 flex items-center gap-3 text-sm font-bold">
-            <input type="checkbox" checked={inStockOnly} onChange={(event) => setInStockOnly(event.target.checked)} className="h-5 w-5 accent-forest" />
+            <Checkbox checked={inStockOnly} onCheckedChange={(checked) => setInStockOnly(checked === true)} />
             In stock only
           </label>
           <label className="mt-3 flex items-center gap-3 text-sm font-bold">
-            <input type="checkbox" checked={organicOnly} onChange={(event) => setOrganicOnly(event.target.checked)} className="h-5 w-5 accent-forest" />
+            <Checkbox checked={organicOnly} onCheckedChange={(checked) => setOrganicOnly(checked === true)} />
             Organic only
           </label>
-        </aside>
+          </CardContent>
+        </Card>
 
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <p className="font-bold text-muted">{filtered.length} products found</p>
+            <Badge variant="secondary">{filtered.length} products found</Badge>
             <p className="hidden text-sm text-muted md:block">Pagination-ready mock catalog</p>
           </div>
           {filtered.length === 0 ? (
-            <div className="grid min-h-80 place-items-center rounded-lg border border-dashed border-forest/20 bg-white text-center">
+            <Card className="grid min-h-80 place-items-center border-dashed text-center">
               <div>
                 <h2 className="text-2xl font-black text-forest">No products found</h2>
                 <p className="mt-2 text-muted">Try a broader search or remove a filter.</p>
               </div>
-            </div>
+            </Card>
           ) : (
             <div className={cn(view === "grid" ? "grid gap-5 sm:grid-cols-2 xl:grid-cols-3" : "grid gap-4")}>
               {filtered.map((product) => (

@@ -5,6 +5,11 @@ import { Check, ChevronRight, Home, Mail, MapPin, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPkr } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 const steps = ["Address", "Delivery", "Review", "Confirmation"];
 
@@ -30,7 +35,8 @@ export function CheckoutFlow() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
-        <section className="rounded-lg border border-forest/10 bg-white p-6 shadow-sm">
+        <Card>
+          <CardContent className="p-6">
           <div className="grid gap-3 sm:grid-cols-4">
             {steps.map((label, index) => (
               <div key={label} className="flex items-center gap-2">
@@ -53,11 +59,13 @@ export function CheckoutFlow() {
           {step === 1 && (
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               {["09:00 - 12:00", "12:00 - 15:00", "18:00 - 21:00"].map((slot, index) => (
-                <button key={slot} className={`rounded-lg border p-5 text-left ${index === 0 ? "border-forest bg-cream" : "border-forest/10"}`}>
+                <Button key={slot} variant={index === 0 ? "secondary" : "outline"} className="h-auto justify-start p-5 text-left">
+                  <span>
                   <Truck className="h-6 w-6 text-forest" />
                   <p className="mt-3 font-black text-forest">Tomorrow</p>
                   <p className="text-sm text-muted">{slot}</p>
-                </button>
+                  </span>
+                </Button>
               ))}
             </div>
           )}
@@ -65,48 +73,56 @@ export function CheckoutFlow() {
           {step === 2 && (
             <div className="mt-8 space-y-4">
               {items.map((item) => (
-                <div key={item.product.id} className="flex justify-between rounded-lg bg-cream p-4">
+                <Card key={item.product.id} className="flex justify-between bg-cream p-4 shadow-none">
                   <div>
                     <p className="font-black">{item.product.name}</p>
                     <p className="text-sm text-muted">{item.quantity} x {formatPkr(item.product.salePrice ?? item.product.price)}</p>
                   </div>
                   <p className="font-black text-forest">{formatPkr((item.product.salePrice ?? item.product.price) * item.quantity)}</p>
-                </div>
+                </Card>
               ))}
             </div>
           )}
 
           {step === 3 && (
-            <div className="mt-8 rounded-lg bg-cream p-8 text-center">
+            <Card className="mt-8 bg-cream p-8 text-center shadow-none">
               <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-forest text-white">
                 <Check className="h-8 w-8" />
               </div>
               <h2 className="mt-4 text-2xl font-black text-forest">Order confirmed</h2>
               <p className="mt-2 text-muted">Your COD order FM-2026-00042 has been queued for confirmation.</p>
-            </div>
+            </Card>
           )}
 
           {step < 3 && (
-            <button
+            <Button
               onClick={() => (step === 2 ? placeOrder() : setStep((value) => value + 1))}
-              className="mt-8 inline-flex h-12 items-center gap-2 rounded-lg bg-forest px-6 font-black text-white"
+              size="lg"
+              className="mt-8"
             >
               {step === 2 ? "Place COD order" : "Continue"}
               <ChevronRight className="h-5 w-5" />
-            </button>
+            </Button>
           )}
-        </section>
+          </CardContent>
+        </Card>
 
-        <aside className="h-fit rounded-lg border border-forest/10 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black text-forest">Order summary</h2>
+        <Card className="h-fit">
+          <CardHeader>
+            <CardTitle>Order summary</CardTitle>
+            <CardDescription>Cash on delivery checkout</CardDescription>
+          </CardHeader>
+          <CardContent>
           <div className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-muted">Subtotal</span><span className="font-bold">{formatPkr(subtotal)}</span></div>
             <div className="flex justify-between"><span className="text-muted">Tax estimate</span><span className="font-bold">{formatPkr(tax)}</span></div>
             <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="font-bold">{delivery === 0 ? "Free" : formatPkr(delivery)}</span></div>
-            <div className="flex justify-between border-t border-forest/10 pt-4 text-lg"><span className="font-black text-forest">Total</span><span className="font-black text-forest">{formatPkr(total)}</span></div>
+            <Separator />
+            <div className="flex justify-between pt-1 text-lg"><span className="font-black text-forest">Total</span><span className="font-black text-forest">{formatPkr(total)}</span></div>
           </div>
-          <div className="mt-5 rounded-lg bg-cream p-4 text-sm text-muted">Free delivery applies above PKR 3,000. Payment method: Cash on Delivery.</div>
-        </aside>
+          <Badge variant="secondary" className="mt-5 whitespace-normal rounded-md p-3 text-left leading-6">Free delivery applies above PKR 3,000. Payment method: Cash on Delivery.</Badge>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -118,7 +134,7 @@ function CheckoutInput({ icon: Icon, label, placeholder }: { icon: typeof Mail; 
       {label}
       <span className="mt-2 flex h-12 items-center gap-3 rounded-lg border border-forest/10 px-4">
         <Icon className="h-5 w-5 text-muted" />
-        <input className="min-w-0 flex-1 outline-none" placeholder={placeholder} />
+        <Input className="h-10 min-w-0 flex-1 border-0 p-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={placeholder} />
       </span>
     </label>
   );

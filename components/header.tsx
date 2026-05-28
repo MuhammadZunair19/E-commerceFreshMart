@@ -7,6 +7,8 @@ import { Menu, Search, ShoppingCart, UserRound } from "lucide-react";
 import { products } from "@/lib/data";
 import { useCartStore } from "@/lib/cart-store";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -60,11 +62,11 @@ export function Header() {
 
         <form onSubmit={submitSearch} className="relative ml-auto hidden flex-1 max-w-2xl md:block">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
-          <input
+          <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search bananas, milk, snacks..."
-            className="h-12 w-full rounded-lg border border-forest/10 bg-cream pl-12 pr-4 text-sm outline-none transition focus:border-fresh focus:bg-white focus:ring-4 focus:ring-fresh/15"
+            className="h-12 bg-cream pl-12 pr-4 focus:bg-white"
           />
           {suggestions.length > 0 && (
             <div className="absolute left-0 right-0 top-14 overflow-hidden rounded-lg border border-forest/10 bg-white shadow-soft">
@@ -83,15 +85,18 @@ export function Header() {
           )}
         </form>
 
-        <button className="grid h-11 w-11 place-items-center rounded-lg border border-forest/10 text-forest lg:hidden" aria-label="Open menu">
+        <Button variant="outline" size="icon" className="h-11 w-11 lg:hidden" aria-label="Open menu">
           <Menu className="h-5 w-5" />
-        </button>
-        <Link href="/account" className="hidden h-11 w-11 place-items-center rounded-lg border border-forest/10 text-forest md:grid" aria-label="Account">
-          <UserRound className="h-5 w-5" />
-        </Link>
-        <button
+        </Button>
+        <Button asChild variant="outline" size="icon" className="hidden h-11 w-11 md:inline-flex">
+          <Link href="/account" aria-label="Account">
+            <UserRound className="h-5 w-5" />
+          </Link>
+        </Button>
+        <Button
           onClick={openCart}
-          className="relative grid h-11 w-11 place-items-center rounded-lg bg-forest text-white transition hover:bg-leaf"
+          size="icon"
+          className="relative h-11 w-11"
           aria-label="Open cart"
         >
           <ShoppingCart className="h-5 w-5" />
@@ -100,7 +105,7 @@ export function Header() {
               {count}
             </span>
           )}
-        </button>
+        </Button>
       </div>
     </header>
   );

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Search, ShoppingCart, UserRound } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const items = [
   { href: "/", label: "Home", icon: Home },
@@ -33,13 +34,13 @@ export function MobileNav() {
             </Link>
           );
         })}
-        <button onClick={openCart} className="relative grid place-items-center text-[11px] font-semibold text-muted" aria-label="Cart">
+        <Button variant="ghost" onClick={openCart} className="relative h-auto rounded-none p-0 text-[11px] font-semibold text-muted" aria-label="Cart">
           <span className="grid gap-1 justify-items-center">
             <ShoppingCart className="h-5 w-5" />
             Cart
           </span>
           {count > 0 && <span className="absolute right-4 top-2 grid h-5 min-w-5 place-items-center rounded-full bg-warning px-1 text-[10px] font-black text-ink">{count}</span>}
-        </button>
+        </Button>
       </div>
     </nav>
   );

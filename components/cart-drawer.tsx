@@ -2,9 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2, X } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
-import { cn, formatPkr } from "@/lib/utils";
+import { formatPkr } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity } = useCartStore();
@@ -14,27 +18,12 @@ export function CartDrawer() {
   const total = subtotal + delivery + tax;
 
   return (
-    <div className={cn("fixed inset-0 z-50 transition", isOpen ? "pointer-events-auto" : "pointer-events-none")}>
-      <button
-        className={cn("absolute inset-0 bg-ink/40 transition-opacity", isOpen ? "opacity-100" : "opacity-0")}
-        onClick={closeCart}
-        aria-label="Close cart overlay"
-      />
-      <aside
-        className={cn(
-          "absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-soft transition-transform duration-300",
-          isOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <div className="flex h-20 items-center justify-between border-b border-forest/10 px-6">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-fresh">Basket</p>
-            <h2 className="text-xl font-black text-forest">Shopping Cart</h2>
-          </div>
-          <button onClick={closeCart} className="grid h-10 w-10 place-items-center rounded-lg border border-forest/10 text-forest" aria-label="Close cart">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+    <Sheet open={isOpen} onOpenChange={(open) => (open ? undefined : closeCart())}>
+      <SheetContent className="flex flex-col p-0">
+        <SheetHeader className="border-b border-forest/10 px-6 py-5">
+          <SheetDescription className="text-xs font-bold uppercase tracking-[0.18em] text-fresh">Basket</SheetDescription>
+          <SheetTitle>Shopping Cart</SheetTitle>
+        </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-6">
           {items.length === 0 ? (
@@ -47,7 +36,7 @@ export function CartDrawer() {
           ) : (
             <div className="space-y-4">
               {items.map((item) => (
-                <div key={item.product.id} className="grid grid-cols-[76px_1fr] gap-4 rounded-lg border border-forest/10 p-3">
+                <Card key={item.product.id} className="grid grid-cols-[76px_1fr] gap-4 p-3 shadow-none">
                   <div className="relative aspect-square overflow-hidden rounded-lg bg-cream">
                     <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="76px" />
                   </div>
@@ -57,24 +46,24 @@ export function CartDrawer() {
                         <h3 className="font-bold text-ink">{item.product.name}</h3>
                         <p className="text-xs text-muted">{item.product.weight}</p>
                       </div>
-                      <button onClick={() => removeItem(item.product.id)} className="text-danger" aria-label={`Remove ${item.product.name}`}>
+                      <Button onClick={() => removeItem(item.product.id)} variant="ghost" size="icon" className="h-8 w-8 text-danger" aria-label={`Remove ${item.product.name}`}>
                         <Trash2 className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </div>
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center rounded-lg border border-forest/10">
-                        <button className="grid h-8 w-8 place-items-center" onClick={() => updateQuantity(item.product.id, item.quantity - 1)} aria-label="Decrease quantity">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity - 1)} aria-label="Decrease quantity">
                           <Minus className="h-4 w-4" />
-                        </button>
+                        </Button>
                         <span className="grid h-8 w-9 place-items-center text-sm font-black">{item.quantity}</span>
-                        <button className="grid h-8 w-8 place-items-center" onClick={() => updateQuantity(item.product.id, item.quantity + 1)} aria-label="Increase quantity">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity + 1)} aria-label="Increase quantity">
                           <Plus className="h-4 w-4" />
-                        </button>
+                        </Button>
                       </div>
                       <p className="font-black text-forest">{formatPkr((item.product.salePrice ?? item.product.price) * item.quantity)}</p>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}
@@ -85,17 +74,18 @@ export function CartDrawer() {
             <div className="flex justify-between"><span className="text-muted">Subtotal</span><span className="font-bold">{formatPkr(subtotal)}</span></div>
             <div className="flex justify-between"><span className="text-muted">Estimated tax</span><span className="font-bold">{formatPkr(tax)}</span></div>
             <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="font-bold">{delivery === 0 ? "Free" : formatPkr(delivery)}</span></div>
-            <div className="flex justify-between border-t border-forest/10 pt-3 text-lg"><span className="font-black text-forest">Total</span><span className="font-black text-forest">{formatPkr(total)}</span></div>
+            <Separator />
+            <div className="flex justify-between pt-1 text-lg"><span className="font-black text-forest">Total</span><span className="font-black text-forest">{formatPkr(total)}</span></div>
           </div>
-          <Link
-            href="/checkout"
-            onClick={closeCart}
-            className={cn("mt-5 grid h-12 place-items-center rounded-lg bg-forest font-black text-white", items.length === 0 && "pointer-events-none opacity-50")}
+          <Button
+            asChild
+            size="lg"
+            className={items.length === 0 ? "mt-5 w-full pointer-events-none opacity-50" : "mt-5 w-full"}
           >
-            Checkout
-          </Link>
+            <Link href="/checkout" onClick={closeCart}>Checkout</Link>
+          </Button>
         </div>
-      </aside>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

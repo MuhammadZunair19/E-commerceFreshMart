@@ -17,6 +17,10 @@ import {
 import { AlertTriangle, Boxes, CircleDollarSign, ClipboardList, PackagePlus, UsersRound } from "lucide-react";
 import { dashboardSeries, products, recentOrders } from "@/lib/data";
 import { formatPkr } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const categorySales = [
   { name: "Fruits", value: 31, color: "#52B788" },
@@ -47,9 +51,9 @@ export function AdminDashboard() {
           </div>
           <nav className="mt-8 space-y-1">
             {["Dashboard", "Products", "Orders", "Customers", "Coupons", "Settings"].map((item, index) => (
-              <button key={item} className={`flex h-11 w-full items-center rounded-lg px-3 text-sm font-bold ${index === 0 ? "bg-white text-forest" : "text-white/78 hover:bg-white/10"}`}>
+              <Button key={item} variant={index === 0 ? "secondary" : "ghost"} className={`w-full justify-start ${index === 0 ? "bg-white text-forest hover:bg-white" : "text-white/78 hover:bg-white/10 hover:text-white"}`}>
                 {item}
-              </button>
+              </Button>
             ))}
           </nav>
         </aside>
@@ -60,41 +64,49 @@ export function AdminDashboard() {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-fresh">Live dashboard</p>
               <h1 className="mt-2 text-4xl font-black text-forest">Operations overview</h1>
             </div>
-            <button className="inline-flex h-11 items-center gap-2 rounded-lg bg-forest px-4 font-black text-white">
+            <Button>
               <PackagePlus className="h-5 w-5" />
               New product
-            </button>
+            </Button>
           </div>
 
           <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className="rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
+                <Card key={stat.label}>
+                  <CardContent className="p-5">
                   <div className="flex items-center justify-between">
                     <span className="grid h-11 w-11 place-items-center rounded-lg bg-cream text-forest">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <span className="rounded-full bg-fresh/20 px-3 py-1 text-xs font-black text-forest">Live</span>
+                    <Badge variant="fresh">Live</Badge>
                   </div>
                   <p className="mt-4 text-sm font-bold text-muted">{stat.label}</p>
                   <p className="mt-1 text-3xl font-black text-forest">{stat.value}</p>
                   <p className="mt-2 text-sm text-muted">{stat.note}</p>
-                </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </section>
 
           <section className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-            <div className="rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black text-forest">Revenue over time</h2>
-                <div className="rounded-lg bg-cream p-1 text-sm font-bold">
-                  <button className="rounded-md bg-white px-3 py-1 text-forest">Daily</button>
-                  <button className="px-3 py-1 text-muted">Weekly</button>
-                  <button className="px-3 py-1 text-muted">Monthly</button>
+            <Card>
+              <CardHeader className="flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <CardTitle>Revenue over time</CardTitle>
+                  <CardDescription>Daily, weekly, and monthly ranges</CardDescription>
                 </div>
-              </div>
+                <Tabs defaultValue="daily">
+                  <TabsList>
+                    <TabsTrigger value="daily">Daily</TabsTrigger>
+                    <TabsTrigger value="weekly">Weekly</TabsTrigger>
+                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </CardHeader>
+              <CardContent>
               <div className="mt-6 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={dashboardSeries}>
@@ -112,10 +124,14 @@ export function AdminDashboard() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
-              <h2 className="text-xl font-black text-forest">Sales by category</h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>Sales by category</CardTitle>
+              </CardHeader>
+              <CardContent>
               <div className="mt-6 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -126,12 +142,16 @@ export function AdminDashboard() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+              </CardContent>
+            </Card>
           </section>
 
           <section className="mt-6 grid gap-6 xl:grid-cols-2">
-            <div className="rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
-              <h2 className="text-xl font-black text-forest">Orders volume</h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>Orders volume</CardTitle>
+              </CardHeader>
+              <CardContent>
               <div className="mt-6 h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={dashboardSeries}>
@@ -143,41 +163,52 @@ export function AdminDashboard() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
-              <h2 className="text-xl font-black text-forest">Live activity feed</h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>Live activity feed</CardTitle>
+              </CardHeader>
+              <CardContent>
               <div className="mt-5 space-y-3">
                 {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between rounded-lg bg-cream p-4">
+                  <Card key={order.id} className="flex items-center justify-between bg-cream p-4 shadow-none">
                     <div>
                       <p className="font-black text-forest">{order.id}</p>
                       <p className="text-sm text-muted">{order.customer} placed {formatPkr(order.total)} order</p>
                     </div>
                     <span className="text-xs font-bold text-muted">{order.time}</span>
-                  </div>
+                  </Card>
                 ))}
               </div>
-            </div>
+              </CardContent>
+            </Card>
           </section>
 
-          <section className="mt-6 rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Boxes className="h-5 w-5 text-forest" />
-              <h2 className="text-xl font-black text-forest">Inventory heatmap</h2>
-            </div>
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Boxes className="h-5 w-5 text-forest" />
+                Inventory heatmap
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               {products.map((product) => {
                 const state = product.stock === 0 ? "bg-danger text-white" : product.stock <= product.threshold ? "bg-warning text-ink" : "bg-fresh/25 text-forest";
                 return (
-                  <button key={product.id} className={`min-h-24 rounded-lg p-3 text-left ${state}`}>
+                  <Button key={product.id} variant="ghost" className={`h-auto min-h-24 justify-start rounded-lg p-3 text-left hover:opacity-90 ${state}`}>
+                    <span>
                     <p className="font-black">{product.name}</p>
                     <p className="mt-2 text-sm font-bold">{product.stock} in stock</p>
-                  </button>
+                    </span>
+                  </Button>
                 );
               })}
             </div>
-          </section>
+            </CardContent>
+          </Card>
         </main>
       </div>
     </div>
