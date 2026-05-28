@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 
 const items = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/products", label: "Categories", icon: LayoutGrid },
-  { href: "/products?search=", label: "Search", icon: Search },
+  { href: "/categories", label: "Categories", icon: LayoutGrid },
+  { href: "/search", label: "Search", icon: Search },
   { href: "/account", label: "Account", icon: UserRound }
 ];
 

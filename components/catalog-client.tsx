@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Grid2X2, List, SlidersHorizontal } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Grid2X2, List, Search, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { categories, products } from "@/lib/data";
 import { cn, formatPkr } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { useCustomerStore } from "@/lib/customer-store";
 
 export function CatalogClient({
   initialSearch,
@@ -27,6 +28,16 @@ export function CatalogClient({
   const [inStockOnly, setInStockOnly] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [maxPrice, setMaxPrice] = useState(1200);
+  const addSearchTerm = useCustomerStore((state) => state.addSearchTerm);
+  const searchHistory = useCustomerStore((state) => state.searchHistory);
+  const clearSearchHistory = useCustomerStore((state) => state.clearSearchHistory);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      addSearchTerm(search);
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [addSearchTerm, search]);
 
   const filtered = useMemo(() => {
     let results = products.filter((product) => {
@@ -74,13 +85,34 @@ export function CatalogClient({
           <CardContent>
           <label className="block text-sm font-bold text-ink">
             Search
-            <Input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="mt-2 h-11"
-              placeholder="Product or brand"
-            />
+            <div className="relative mt-2">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <Input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="h-11 pl-9 pr-9"
+                placeholder="Product or brand"
+              />
+              {search && (
+                <Button variant="ghost" size="icon" className="absolute right-1 top-1 h-9 w-9" onClick={() => setSearch("")} aria-label="Clear search">
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </label>
+          {searchHistory.length > 0 && (
+            <div className="mt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-muted">Recent searches</p>
+                <Button variant="ghost" size="sm" onClick={clearSearchHistory}>Clear</Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {searchHistory.map((term) => (
+                  <Button key={term} variant="secondary" size="sm" onClick={() => setSearch(term)}>{term}</Button>
+                ))}
+              </div>
+            </div>
+          )}
           <label className="mt-4 block text-sm font-bold text-ink">
             Category
             <Select value={category} onValueChange={setCategory}>
@@ -138,6 +170,13 @@ export function CatalogClient({
               <div>
                 <h2 className="text-2xl font-black text-forest">No products found</h2>
                 <p className="mt-2 text-muted">Try a broader search or remove a filter.</p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                  {["milk", "banana", "bread"].map((term) => (
+                    <Button key={term} variant="outline" size="sm" onClick={() => setSearch(term)}>
+                      Search {term}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </Card>
           ) : (

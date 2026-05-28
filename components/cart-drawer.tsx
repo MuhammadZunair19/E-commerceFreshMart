@@ -2,20 +2,36 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Tag, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPkr } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity } = useCartStore();
+  const [coupon, setCoupon] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<"FRESH10" | "FREEDEL" | null>(null);
   const subtotal = items.reduce((sum, item) => sum + (item.product.salePrice ?? item.product.price) * item.quantity, 0);
-  const delivery = subtotal > 3000 || subtotal === 0 ? 0 : 199;
+  const couponDiscount = appliedCoupon === "FRESH10" ? Math.round(subtotal * 0.1) : 0;
+  const delivery = subtotal > 3000 || subtotal === 0 || appliedCoupon === "FREEDEL" ? 0 : 199;
   const tax = Math.round(subtotal * 0.03);
-  const total = subtotal + delivery + tax;
+  const total = Math.max(0, subtotal - couponDiscount + delivery + tax);
+
+  function applyCoupon() {
+    const normalized = coupon.trim().toUpperCase();
+    if (normalized === "FRESH10" || normalized === "FREEDEL") {
+      setAppliedCoupon(normalized);
+      toast.success(`${normalized} applied`);
+      return;
+    }
+    toast.error("Try FRESH10 or FREEDEL");
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => (open ? undefined : closeCart())}>
@@ -70,8 +86,16 @@ export function CartDrawer() {
         </div>
 
         <div className="border-t border-forest/10 p-6">
+          <div className="mb-4 flex gap-2">
+            <div className="relative flex-1">
+              <Tag className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <Input value={coupon} onChange={(event) => setCoupon(event.target.value)} className="pl-9" placeholder="FRESH10 or FREEDEL" />
+            </div>
+            <Button variant="outline" onClick={applyCoupon}>Apply</Button>
+          </div>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted">Subtotal</span><span className="font-bold">{formatPkr(subtotal)}</span></div>
+            {couponDiscount > 0 && <div className="flex justify-between"><span className="text-muted">Coupon</span><span className="font-bold text-forest">-{formatPkr(couponDiscount)}</span></div>}
             <div className="flex justify-between"><span className="text-muted">Estimated tax</span><span className="font-bold">{formatPkr(tax)}</span></div>
             <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="font-bold">{delivery === 0 ? "Free" : formatPkr(delivery)}</span></div>
             <Separator />

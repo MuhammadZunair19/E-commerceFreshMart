@@ -5,11 +5,14 @@ import { Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import type { Product } from "@/lib/data";
 import { useCartStore } from "@/lib/cart-store";
+import { useCustomerStore } from "@/lib/customer-store";
 import { Button } from "@/components/ui/button";
 
 export function ProductDetailActions({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const toggleWishlist = useCustomerStore((state) => state.toggleWishlist);
+  const isWishlisted = useCustomerStore((state) => state.isWishlisted(product.id));
   const max = Math.max(product.stock, 1);
 
   return (
@@ -34,8 +37,17 @@ export function ProductDetailActions({ product }: { product: Product }) {
         <ShoppingCart className="h-5 w-5" />
         Add to cart
       </Button>
-      <Button variant="outline" size="icon" className="h-12 w-12" aria-label="Add to wishlist">
-        <Heart className="h-5 w-5" />
+      <Button
+        variant={isWishlisted ? "secondary" : "outline"}
+        size="icon"
+        className="h-12 w-12"
+        onClick={() => {
+          toggleWishlist(product.id);
+          toast.success(isWishlisted ? `${product.name} removed from wishlist` : `${product.name} saved to wishlist`);
+        }}
+        aria-label={`${isWishlisted ? "Remove" : "Add"} wishlist`}
+      >
+        <Heart className={isWishlisted ? "h-5 w-5 fill-danger text-danger" : "h-5 w-5"} />
       </Button>
     </div>
   );

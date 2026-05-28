@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { RecentlyViewed } from "@/components/recently-viewed";
 
 export default function HomePage() {
   const featured = products.filter((product) => product.featured);
@@ -108,6 +109,7 @@ export default function HomePage() {
           <Button size="lg">Join</Button>
         </form>
       </section>
+      <RecentlyViewed />
     </>
   );
 }

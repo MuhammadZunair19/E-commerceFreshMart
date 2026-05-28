@@ -1,4 +1,5 @@
 import { Bell, Heart, MapPin, PackageCheck, Settings, UserRound } from "lucide-react";
+import Link from "next/link";
 import { recentOrders } from "@/lib/data";
 import { formatPkr } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -22,18 +23,20 @@ export default function AccountPage() {
             </div>
           </div>
           <nav className="mt-6 space-y-1">
-            {[
-              { icon: PackageCheck, label: "Orders" },
-              { icon: MapPin, label: "Addresses" },
-              { icon: Heart, label: "Wishlist" },
-              { icon: Bell, label: "Notifications" },
-              { icon: Settings, label: "Settings" }
+              {[
+              { icon: PackageCheck, label: "Orders", href: "/orders" },
+              { icon: MapPin, label: "Addresses", href: "/addresses" },
+              { icon: Heart, label: "Wishlist", href: "/wishlist" },
+              { icon: Bell, label: "Notifications", href: "/profile" },
+              { icon: Settings, label: "Settings", href: "/profile" }
             ].map((item, index) => {
               const Icon = item.icon;
               return (
-                <Button key={item.label} variant={index === 0 ? "secondary" : "ghost"} className="w-full justify-start">
-                  <Icon className="h-5 w-5" />
-                  {item.label}
+                <Button key={item.label} asChild variant={index === 0 ? "secondary" : "ghost"} className="w-full justify-start">
+                  <Link href={item.href}>
+                    <Icon className="h-5 w-5" />
+                    {item.label}
+                  </Link>
                 </Button>
               );
             })}

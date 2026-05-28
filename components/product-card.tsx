@@ -6,6 +6,7 @@ import { Heart, ShoppingCart, Star } from "lucide-react";
 import { toast } from "sonner";
 import type { Product } from "@/lib/data";
 import { useCartStore } from "@/lib/cart-store";
+import { useCustomerStore } from "@/lib/customer-store";
 import { formatPkr } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,8 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
+  const toggleWishlist = useCustomerStore((state) => state.toggleWishlist);
+  const isWishlisted = useCustomerStore((state) => state.isWishlisted(product.id));
   const discount = product.salePrice ? Math.round(((product.price - product.salePrice) / product.price) * 100) : 0;
 
   return (
@@ -31,8 +34,17 @@ export function ProductCard({ product }: { product: Product }) {
             </Link>
             <p className="mt-1 text-sm text-muted">{product.weight}</p>
           </div>
-          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" aria-label={`Add ${product.name} to wishlist`}>
-            <Heart className="h-4 w-4" />
+          <Button
+            variant={isWishlisted ? "secondary" : "outline"}
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={() => {
+              toggleWishlist(product.id);
+              toast.success(isWishlisted ? `${product.name} removed from wishlist` : `${product.name} saved to wishlist`);
+            }}
+            aria-label={`${isWishlisted ? "Remove" : "Add"} ${product.name} ${isWishlisted ? "from" : "to"} wishlist`}
+          >
+            <Heart className={isWishlisted ? "h-4 w-4 fill-danger text-danger" : "h-4 w-4"} />
           </Button>
         </div>
         <div className="mt-3 flex items-center gap-1 text-sm">

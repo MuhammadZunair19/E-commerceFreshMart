@@ -15,6 +15,7 @@ import {
   YAxis
 } from "recharts";
 import { AlertTriangle, Boxes, CircleDollarSign, ClipboardList, PackagePlus, UsersRound } from "lucide-react";
+import Link from "next/link";
 import { dashboardSeries, products, recentOrders } from "@/lib/data";
 import { formatPkr } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -50,9 +51,16 @@ export function AdminDashboard() {
             </div>
           </div>
           <nav className="mt-8 space-y-1">
-            {["Dashboard", "Products", "Orders", "Customers", "Coupons", "Settings"].map((item, index) => (
-              <Button key={item} variant={index === 0 ? "secondary" : "ghost"} className={`w-full justify-start ${index === 0 ? "bg-white text-forest hover:bg-white" : "text-white/78 hover:bg-white/10 hover:text-white"}`}>
-                {item}
+            {[
+              ["Dashboard", "/admin"],
+              ["Products", "/admin/products"],
+              ["Orders", "/admin/orders"],
+              ["Customers", "/admin/users"],
+              ["Coupons", "/admin/coupons"],
+              ["Settings", "/admin/settings"]
+            ].map(([item, href], index) => (
+              <Button key={item} asChild variant={index === 0 ? "secondary" : "ghost"} className={`w-full justify-start ${index === 0 ? "bg-white text-forest hover:bg-white" : "text-white/78 hover:bg-white/10 hover:text-white"}`}>
+                <Link href={href}>{item}</Link>
               </Button>
             ))}
           </nav>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, ChevronRight, Home, Mail, MapPin, Truck } from "lucide-react";
+import { Check, ChevronRight, Home, Mail, MapPin, Tag, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPkr } from "@/lib/utils";
@@ -15,16 +15,28 @@ const steps = ["Address", "Delivery", "Review", "Confirmation"];
 
 export function CheckoutFlow() {
   const [step, setStep] = useState(0);
+  const [deliverySlot, setDeliverySlot] = useState("09:00 - 12:00");
+  const [coupon, setCoupon] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
   const { items, clearCart } = useCartStore();
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + (item.product.salePrice ?? item.product.price) * item.quantity, 0), [items]);
   const delivery = subtotal > 3000 || subtotal === 0 ? 0 : 199;
   const tax = Math.round(subtotal * 0.03);
-  const total = subtotal + delivery + tax;
+  const total = Math.max(0, subtotal - couponDiscount + delivery + tax);
 
   function placeOrder() {
     clearCart();
     setStep(3);
     toast.success("Order FM-2026-00042 placed");
+  }
+
+  function applyCoupon() {
+    if (coupon.trim().toUpperCase() === "FRESH10") {
+      setCouponDiscount(Math.round(subtotal * 0.1));
+      toast.success("FRESH10 applied");
+      return;
+    }
+    toast.error("Use FRESH10 for this demo");
   }
 
   return (
@@ -58,8 +70,8 @@ export function CheckoutFlow() {
 
           {step === 1 && (
             <div className="mt-8 grid gap-4 md:grid-cols-3">
-              {["09:00 - 12:00", "12:00 - 15:00", "18:00 - 21:00"].map((slot, index) => (
-                <Button key={slot} variant={index === 0 ? "secondary" : "outline"} className="h-auto justify-start p-5 text-left">
+              {["09:00 - 12:00", "12:00 - 15:00", "18:00 - 21:00"].map((slot) => (
+                <Button key={slot} variant={deliverySlot === slot ? "secondary" : "outline"} onClick={() => setDeliverySlot(slot)} className="h-auto justify-start p-5 text-left">
                   <span>
                   <Truck className="h-6 w-6 text-forest" />
                   <p className="mt-3 font-black text-forest">Tomorrow</p>
@@ -115,10 +127,18 @@ export function CheckoutFlow() {
           <CardContent>
           <div className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-muted">Subtotal</span><span className="font-bold">{formatPkr(subtotal)}</span></div>
+            {couponDiscount > 0 && <div className="flex justify-between"><span className="text-muted">Coupon</span><span className="font-bold text-forest">-{formatPkr(couponDiscount)}</span></div>}
             <div className="flex justify-between"><span className="text-muted">Tax estimate</span><span className="font-bold">{formatPkr(tax)}</span></div>
             <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="font-bold">{delivery === 0 ? "Free" : formatPkr(delivery)}</span></div>
             <Separator />
             <div className="flex justify-between pt-1 text-lg"><span className="font-black text-forest">Total</span><span className="font-black text-forest">{formatPkr(total)}</span></div>
+          </div>
+          <div className="mt-5 flex gap-2">
+            <div className="relative flex-1">
+              <Tag className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <Input value={coupon} onChange={(event) => setCoupon(event.target.value)} className="pl-9" placeholder="FRESH10" />
+            </div>
+            <Button variant="outline" onClick={applyCoupon}>Apply</Button>
           </div>
           <Badge variant="secondary" className="mt-5 whitespace-normal rounded-md p-3 text-left leading-6">Free delivery applies above PKR 3,000. Payment method: Cash on Delivery.</Badge>
           </CardContent>

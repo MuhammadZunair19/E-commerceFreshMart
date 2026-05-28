@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { CheckCircle2, Star } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { ProductDetailActions } from "@/components/product-detail-actions";
+import { ProductViewTracker } from "@/components/product-view-tracker";
+import { ProductReviews } from "@/components/product-reviews";
 import { products } from "@/lib/data";
 import { formatPkr } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +25,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
   return (
     <div className="container-x py-8 lg:py-12">
+      <ProductViewTracker product={product} />
       <div className="mb-6 text-sm text-muted">
         <Link href="/products" className="font-bold text-forest">Products</Link> / {product.name}
       </div>
@@ -103,6 +106,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           </div>
         </section>
       )}
+      <section className="mt-14">
+        <ProductReviews rating={product.rating} count={product.reviews} />
+      </section>
     </div>
   );
 }
